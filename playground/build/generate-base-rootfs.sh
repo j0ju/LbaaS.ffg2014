@@ -14,6 +14,8 @@ EXTRA_PKGS=
 
 # we want to work
 EXTRA_PKGS="$EXTRA_PKGS bzip2 xz-utils vim"
+# I also want to work
+EXTRA_PKGS="$EXTRA_PKGS pv tcpdump atop"
 # TODO: ??? via masterless puppet?
 EXTRA_PKGS="$EXTRA_PKGS mc tmux screen openssh-server rsync"
 

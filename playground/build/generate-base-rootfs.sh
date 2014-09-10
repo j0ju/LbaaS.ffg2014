@@ -1,6 +1,11 @@
 #/bin/bash
 # generates base debian wheezy filesystem
 
+if ! [ "$(id -u)" = 0 ]; then
+  echo "$0 should only be started as root."
+  exit 1
+fi >&2
+
 set -e
 set -x
 

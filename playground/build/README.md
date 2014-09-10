@@ -8,5 +8,6 @@ The directory packages contains all packages not part of the wheezy distribution
 The build of the playground VM has been done under Debian/Wheezy.
 
 1st run generate-base-rootfs.sh
-2nd run generate-playground.sh
+...
+last. run generate-playground.sh
 

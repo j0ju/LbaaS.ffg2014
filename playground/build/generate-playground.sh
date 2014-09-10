@@ -1,5 +1,5 @@
 #!/bin/bash
-SIZE=6G
+SIZE=8G
 MYPATH="$(dirname "$(readlink -f "$0")")"
 BUILDDIR="${MYPATH}/created"
 IMGNAME="kvm-playground.raw"
@@ -85,7 +85,7 @@ sed -i -e "s/base-rootfs/playground/" $( grep "base-rootfs" -rl "$MNT"/etc )
 mount -o bind /dev "$MNT"/dev
 chroot "$MNT" /bin/sh -x -e <<EOF
   mount -t proc proc /proc
-  apt-get install -y extlinux initramfs-tools python3 libapparmor1 
+  apt-get install -y extlinux initramfs-tools python3 libapparmor1 libvirt-bin virt-top 
   dpkg -i /tmp/*.deb
   extlinux-install "$LOOP"
   extlinux-update

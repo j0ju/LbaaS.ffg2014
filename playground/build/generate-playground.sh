@@ -5,6 +5,11 @@ IMG=kvm-playground.raw
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
 
+if [ ! "$(id -u)" = 0 ]; then
+  echo "$0 should only be started as root."
+  exit 1
+fi >&2
+
 set -e
 set -x
 

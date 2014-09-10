@@ -40,6 +40,9 @@ cleanup() {
 }
 trap cleanup EXIT INT QUIT TERM
 
+#
+# Make sure the loop-kernelmodule is loaded or this will fail! (modprobe loop)
+#
 LOOP="$(losetup -fv $IMG | awk '{print $NF}')"
 PARTS="$(kpartx -av "$LOOP" | cut -f3 -d\  | tr '\n' ' ')"
 

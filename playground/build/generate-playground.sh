@@ -1,5 +1,5 @@
 #!/bin/bash
-SIZE=10G
+SIZE=6G
 IMG=kvm-playground.raw
 MNT="$( mktemp -d )"
 
@@ -19,6 +19,7 @@ truncate -s "$SIZE" "$IMG"
 
 parted -s "$IMG" mktable msdos
 parted -s "$IMG" mkpart primary ext4 128KiB 2048MiB
+parted -s "$IMG" set 1 boot on
 parted -s "$IMG" mkpart primary linux-swap 2048MiB 2560MiB
 
 cleanup() {
@@ -61,21 +62,6 @@ rsync -aH base-rootfs/ "$MNT"
 
 cp packages/*.deb "$MNT"/tmp
 
-grub-install --boot-directory="$MNT"/boot "$LOOP"
-
-
-mount -o bind /dev "$MNT"/dev
-chroot "$MNT" /bin/sh -x -e <<EOF
-  mount -t proc proc /proc
-  apt-get install -y grub-pc initramfs-tools
-  dpkg -i /tmp/*.deb
-  rm -rf /tmp/*.deb /debian
-  umount /proc
-EOF
-
-sed -i -re 's@root=[^ ]+@root=UUID='"$ROOT_UUID"'@' "$MNT"/boot/grub/grub.cfg
-sed -i -e "s/base-rootfs/playground/" $( grep "base-rootfs" -rl "$MNT"/etc )
-
 cat > "$MNT"/etc/fstab << EOF
 # /etc/fstab - $0
 proc /proc proc defaults 0 0
@@ -84,4 +70,19 @@ tmpfs /tmp tmpfs defaults 0 0
 UUID=$ROOT_UUID /    ext3 relatime,errors=remount-ro 0 2
 UUID=$SWAP_UUID swap swap defaults 0 2
 EOF
+
+sed -i -e "s/base-rootfs/playground/" $( grep "base-rootfs" -rl "$MNT"/etc )
+
+mount -o bind /dev "$MNT"/dev
+chroot "$MNT" /bin/sh -x -e <<EOF
+  mount -t proc proc /proc
+  apt-get install -y extlinux initramfs-tools python3 libapparmor1 
+  dpkg -i /tmp/*.deb
+  extlinux-install "$LOOP"
+  extlinux-update
+
+  rm -rf /tmp/*.deb /debian
+  umount /proc
+EOF
+umount "$MNT"/dev
 

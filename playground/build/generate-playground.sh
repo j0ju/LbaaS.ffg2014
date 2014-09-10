@@ -1,7 +1,11 @@
 #!/bin/bash
 SIZE=10G
-IMG=kvm-playground.raw
+MYPATH="$(dirname "$(readlink -f "$0")")"
+BUILDDIR="${MYPATH}/created"
+IMGNAME="kvm-playground.raw"
+IMG="${BUILDDIR}/${IMGNAME}"
 MNT="$( mktemp -d )"
+BASEFSDIR="${BUILDDIR}/base-rootfs"
 
 export LC_ALL=C
 export DEBIAN_FRONTEND=noninteractive
@@ -13,6 +17,8 @@ fi >&2
 
 set -e
 set -x
+
+[ -d "$BUILDDIR" ] || mkdir -p "$BUILDDIR"
 
 rm -f "$IMG"
 truncate -s "$SIZE" "$IMG"
@@ -34,7 +40,7 @@ cleanup() {
 }
 trap cleanup EXIT INT QUIT TERM
 
-LOOP="$(losetup -fv kvm-playground.raw | awk '{print $NF}')"
+LOOP="$(losetup -fv $IMG | awk '{print $NF}')"
 PARTS="$(kpartx -av "$LOOP" | cut -f3 -d\  | tr '\n' ' ')"
 
 parse_partitions() {
@@ -57,7 +63,7 @@ eval "$(blkid "$ROOT_P" -o export)" && ROOT_UUID="$UUID"
 eval "$(mkswap "$SWAP_P" -L playground-swap -f)" && SWAP_UUID="$UUID"
 
 mount "$ROOT_P" "$MNT"
-rsync -aH base-rootfs/ "$MNT"
+rsync -aH "$BASEFSDIR"/ "$MNT"
 
 cp packages/*.deb "$MNT"/tmp
 

@@ -1,6 +1,11 @@
 #/bin/bash
 # generates base debian wheezy filesystem
 
+MYPATH="$(dirname "$(readlink -f "$0")")"
+BUILDDIR="${MYPATH}/created"
+BASEFSDIR="${BUILDDIR}/base-rootfs"
+
+
 if ! [ "$(id -u)" = 0 ]; then
   echo "$0 should only be started as root."
   exit 1
@@ -21,30 +26,32 @@ EXTRA_PKGS="$EXTRA_PKGS mc tmux screen openssh-server rsync"
 
 # config management
 EXTRA_PKGS="$EXTRA_PKGS puppet git"
-
 # TODO: what do we do with user supplied packages?
-rm -rf base-rootfs
+
+
+[ -d "$BUILDDIR" ] || mkdir -p "$BUILDDIR"
+rm -rf $BASEFSDIR
 debootstrap \
   --include="$(echo "$EXTRA_PKGS" | sed -re 's/\s+/,/g' -e 's/^,|,$//g')" \
   wheezy \
-  base-rootfs \
+  $BASEFSDIR \
 # end of debootstrap
 
 # do not start daemons automatically
-cat > base-rootfs/usr/sbin/policy-rc.d <<EOF
+cat > $BASEFSDIR/usr/sbin/policy-rc.d <<EOF
 #!/bin/sh
 echo "$0: $*"
 exit 101
 EOF
-chmod a+x base-rootfs/usr/sbin/policy-rc.d
+chmod a+x $BASEFSDIR/usr/sbin/policy-rc.d
 
-echo root:$ROOTPW | chroot base-rootfs chpasswd
+echo root:$ROOTPW | chroot $BASEFSDIR chpasswd
 
-sed -i -e "s/$(hostname)/base-rootfs/" $( grep "$(hostname)" -rl base-rootfs/etc )
+sed -i -e "s/$(hostname)/$BASEFSDIR/" $( grep "$(hostname)" -rl $BASEFSDIR/etc )
 
-cat > base-rootfs/etc/hosts << EOF
+cat > $BASEFSDIR/etc/hosts << EOF
 # localhost IPv4
-127.0.0.1	base-rootfs
+127.0.0.1	$BASEFSDIR
 127.0.0.1	localhost
 
 # localhost IPv6

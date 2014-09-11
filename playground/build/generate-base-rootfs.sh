@@ -47,7 +47,7 @@ chmod a+x $BASEFSDIR/usr/sbin/policy-rc.d
 
 echo root:$ROOTPW | chroot $BASEFSDIR chpasswd
 
-sed -i -e "s/$(hostname)/$BASEFSDIR/" $( grep "$(hostname)" -rl $BASEFSDIR/etc )
+sed -i -e "s/$(hostname)/base-rootfs/" $( grep "$(hostname)" -rl $BASEFSDIR/etc )
 
 cat > $BASEFSDIR/etc/hosts << EOF
 # localhost IPv4

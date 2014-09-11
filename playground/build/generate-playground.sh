@@ -69,7 +69,7 @@ eval "$(mkswap "$SWAP_P" -L playground-swap -f)" && SWAP_UUID="$UUID"
 mount "$ROOT_P" "$MNT"
 rsync -aH "$BASEFSDIR"/ "$MNT"
 
-cp packages/*.deb "$MNT"/tmp
+cp "$MYPATH"/packages/*.deb "$MNT"/tmp
 
 cat > "$MNT"/etc/fstab << EOF
 # /etc/fstab - $0
@@ -80,7 +80,9 @@ UUID=$ROOT_UUID /    ext3 relatime,errors=remount-ro 0 2
 UUID=$SWAP_UUID swap swap defaults 0 2
 EOF
 
-sed -i -e "s/base-rootfs/playground/" $( grep "base-rootfs" -rl "$MNT"/etc )
+[ -d "$MYPATH"/playground.local ] && rsync -a "$MYPATH"/playground.local/ "$MNT"
+
+sed -i -e "s/rootfs-base/playground/" $( grep "base-rootfs" -rl "$MNT"/etc )
 
 mount -o bind /dev "$MNT"/dev
 chroot "$MNT" /bin/sh -x -e <<EOF

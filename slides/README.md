@@ -3,6 +3,8 @@
  * Motivation
    * Größere HA-LB Installationen
    * Viele Netze, Getrennte Routing Domains
+   * Container Virtualisiertung vs Voll-Virt.
+     * niedriege Latenzen
    * Fancy new Kernel-Shit
    * Weil wir es können
 

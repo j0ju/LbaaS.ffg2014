@@ -95,3 +95,6 @@ chroot "$MNT" /bin/sh -x -e <<EOF
 EOF
 umount "$MNT"/dev
 
+# we create as root, but want to use as user
+chmod a+rw "$IMG"
+

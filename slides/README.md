@@ -15,6 +15,7 @@
    * iproute2
    * Namespaces
    * CGroups
+   * Capabilities
    * LXC
 
  * Ziel: Vorstellung wie sieht unsere Umgebung aus
@@ -37,13 +38,16 @@
     * tap/veth/macvlan mit iproute2
 
  * Namespaces für Subsysteme
+   * IPC
    * UTS
    * PID
    * Mount
    * Net
+   * User
    * Übungen
      * unshare
        * UTS / host
+       * PID
        * ip netns $PID
        * veth / macvlan
 
@@ -53,6 +57,7 @@
    * chroot
    * plus Namespaces
    * plus CGroups
+   * plus Capabilities
    * Vollcontainer vs. Application Container
    * Übungen lxc-create
 
